@@ -217,7 +217,8 @@ export function GET() {
   return json({ configured: !!(e.user && e.pass && e.key), credentials: !!(e.user && e.pass), accessKey: !!e.key, base: e.base });
 }
 
-export async function POST(req: Request, f: typeof fetch = fetch) {
+/** Lógica del endpoint; `f` permite inyectar un fetch simulado en las pruebas. */
+export async function handlePost(req: Request, f: typeof fetch) {
   const e = env();
   if (!e.user || !e.pass || !e.key) return json({ error: "Buscador no configurado: faltan SIPS_USER, SIPS_PASSWORD o APP_ACCESS_KEY en Vercel." }, 503);
   if (req.headers.get("x-app-key") !== e.key) return json({ error: "Clave de acceso incorrecta. Revísala en Ajustes." }, 401);
@@ -239,6 +240,11 @@ export async function POST(req: Request, f: typeof fetch = fetch) {
     session = null;
     return json({ error: (err as Error).message }, 502);
   }
+}
+
+/** Vercel invoca POST(request, context): el segundo argumento NO es fetch. */
+export function POST(req: Request) {
+  return handlePost(req, (...a: Parameters<typeof fetch>) => fetch(...a));
 }
 
 /** Solo para pruebas. */
