@@ -34,7 +34,7 @@ Todos los precios se pueden editar en **Ajustes** cuando se publique una nueva r
 ## Desarrollo
 
 ```bash
-npm install --legacy-peer-deps
+npm install
 npm run dev          # http://localhost:3000
 npx vitest run       # 18 pruebas (importación real, normativa, optimizador vs fuerza bruta, reactiva, comparador, alertas, PDF)
 npm run build
@@ -45,7 +45,7 @@ npm run build
 ## Despliegue en Vercel
 
 1. Sube el repositorio a GitHub e impórtalo en Vercel (framework detectado: Next.js).
-2. Usa como comando de instalación `npm install --legacy-peer-deps`.
+2. No hace falta configurar nada más: Vercel ejecuta `npm install` y `next build` (Node ≥ 20.9).
 3. Opcional: define `SIPS_USER` y `SIPS_PASSWORD` en *Environment Variables* (consulta `.env.example`).
 
 ## Conector SIPS
