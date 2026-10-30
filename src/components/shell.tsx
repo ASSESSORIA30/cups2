@@ -5,7 +5,7 @@ import { useTheme, ThemeProvider } from "next-themes";
 import { Command } from "cmdk";
 import { motion } from "motion/react";
 import { useEffect, useMemo, useState } from "react";
-import { Bell, Gauge, LayoutDashboard, Moon, Radar, Search, Settings, Store, Sun, Upload, Menu, X, FlaskConical } from "lucide-react";
+import { Bell, DatabaseZap, Gauge, LayoutDashboard, Moon, Radar, Search, Settings, Store, Sun, Upload, Menu, X, FlaskConical } from "lucide-react";
 import { Toaster } from "sonner";
 import { useStore } from "@/lib/store";
 import { supplyAlerts } from "@/lib/alerts";
@@ -13,9 +13,11 @@ import { cn, fmt } from "@/lib/format";
 import { annualActive } from "@/lib/parse";
 import { Badge, Dialog } from "./ui";
 import { ImportPanel } from "./import-panel";
+import { looksLikeCups } from "@/lib/sips-client";
 
 const NAV = [
   { href: "/", label: "Panel", icon: LayoutDashboard },
+  { href: "/sips", label: "Buscador SIPS", icon: DatabaseZap },
   { href: "/radar", label: "Radar comercial", icon: Radar },
   { href: "/alertas", label: "Alertas", icon: Bell },
   { href: "/mercado", label: "Energy Market", icon: Store },
@@ -53,6 +55,7 @@ function ThemeToggle() {
 
 function GlobalSearch() {
   const [open, setOpen] = useState(false);
+  const [q, setQ] = useState("");
   const supplies = useStore((s) => s.supplies);
   const router = useRouter();
   useEffect(() => {
@@ -81,10 +84,26 @@ function GlobalSearch() {
             >
               <div className="flex items-center gap-2 border-b border-border px-4">
                 <Search className="size-4 text-fg-3" />
-                <Command.Input autoFocus placeholder="CUPS, dirección, localidad, comercializadora…" className="h-12 w-full bg-transparent text-sm outline-none placeholder:text-fg-3" />
+                <Command.Input value={q} onValueChange={setQ} autoFocus placeholder="CUPS, dirección, localidad, comercializadora…" className="h-12 w-full bg-transparent text-sm outline-none placeholder:text-fg-3" />
               </div>
               <Command.List className="max-h-[50vh] overflow-y-auto p-2">
-                <Command.Empty className="p-6 text-center text-sm text-fg-3">{supplies.length ? "Sin resultados." : "Importa un Excel SIPS para empezar."}</Command.Empty>
+                {q.trim().length > 3 && (
+                  <Command.Item
+                    value={`sips-portal ${q}`}
+                    onSelect={() => {
+                      setOpen(false);
+                      const c = q.toUpperCase().replace(/[\s\-.]/g, "");
+                      router.push(looksLikeCups(c) ? `/sips/?cups=${encodeURIComponent(c)}` : "/sips/");
+                    }}
+                    className="mb-1 flex cursor-pointer items-center gap-3 rounded-lg border border-accent/30 bg-accent/5 px-3 py-2.5 text-sm data-[selected=true]:bg-accent/15"
+                  >
+                    <DatabaseZap className="size-4 text-accent" />
+                    <span>
+                      Buscar <b className="num">{q.trim()}</b> en el portal SIPS
+                    </span>
+                  </Command.Item>
+                )}
+                <Command.Empty className="p-6 text-center text-sm text-fg-3">{supplies.length ? "Sin resultados en la cartera." : "Importa un Excel o usa el Buscador SIPS."}</Command.Empty>
                 {supplies.slice(0, 2000).map((s) => (
                   <Command.Item
                     key={s.cups}

@@ -37,6 +37,7 @@ export interface Settings {
   logoDataUrl: string | null;
   userName: string;
   reactiveShareOutsideP6: number | null;
+  sipsKey: string;
 }
 
 export interface InvoiceData {
@@ -74,6 +75,7 @@ export const DEFAULT_SETTINGS: Settings = {
   logoDataUrl: null,
   userName: "Comercial Assessoria 3.0",
   reactiveShareOutsideP6: null,
+  sipsKey: "",
 };
 
 export function emptyOpp(cups: string): Opportunity {

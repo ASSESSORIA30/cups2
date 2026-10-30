@@ -1,7 +1,9 @@
 "use client";
 import { Image as ImageIcon, KeyRound, RotateCcw, Scale, Settings, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { useEffect, useState } from "react";
 import { DEFAULT_SETTINGS, useStore } from "@/lib/store";
+import { sipsStatus, type SipsStatus } from "@/lib/sips-client";
 import { TARIFFS, powerPeriods, regulatedPowerPrice } from "@/lib/tariffs";
 import { DEFAULT_SCORING, type ScoringConfig } from "@/lib/scoring";
 import { DEFAULT_ALERT_CONFIG, type AlertConfig } from "@/lib/alerts";
@@ -14,6 +16,10 @@ export default function SettingsPage() {
   const setSettings = useStore((s) => s.setSettings);
   const clear = useStore((s) => s.clearSupplies);
   const reg = settings.regulated;
+  const [sips, setSips] = useState<SipsStatus | null>(null);
+  useEffect(() => {
+    sipsStatus().then(setSips);
+  }, []);
 
   const setPeaje = (t: (typeof TARIFFS)[number], i: number, v: number | null, key: "peajePot" | "cargoPot" | "excess45") =>
     setSettings((s) => ({ ...s, regulated: { ...s.regulated, [key]: { ...s.regulated[key], [t]: s.regulated[key][t].map((x, j) => (j === i ? (v ?? 0) : x)) } } }));
@@ -182,11 +188,18 @@ export default function SettingsPage() {
           </CardBody>
         </Card>
         <Card>
-          <CardHeader icon={<KeyRound />} title="Conector portal SIPS" subtitle="eas.renovaenergy.es" right={<Badge tone="warning">Pendiente</Badge>} />
+          <CardHeader
+            icon={<KeyRound />}
+            title="Buscador SIPS (portal EAS Renovae)"
+            subtitle="eas.renovaenergy.es"
+            right={<Badge tone={sips?.configured ? "good" : "warning"}>{!sips ? "Comprobando…" : !sips.available ? "Solo en Vercel" : sips.configured ? "Servidor configurado" : "Falta configurar"}</Badge>}
+          />
           <CardBody className="space-y-3 text-sm text-fg-2">
-            <p>La descarga automática desde el portal está pendiente de documentar su acceso. Exporta el Excel desde el portal SIPS e impórtalo aquí: es exactamente el mismo formato.</p>
-            <Callout tone="info">
-              Cuando se implemente, las credenciales irán en variables de entorno de un servicio de servidor (<code>SIPS_USER</code>, <code>SIPS_PASSWORD</code>), nunca en el navegador ni en el código.
+            <Field label="Clave de acceso del buscador (APP_ACCESS_KEY)" hint="La misma que pusiste en Vercel. Se guarda solo en este navegador.">
+              <Input type="password" autoComplete="off" value={settings.sipsKey} onChange={(e) => setSettings((s) => ({ ...s, sipsKey: e.target.value.trim() }))} placeholder="Clave de acceso" />
+            </Field>
+            <Callout tone="info" title="Configuración en Vercel (una sola vez)">
+              Project → Settings → Environment Variables: <code>SIPS_USER</code>, <code>SIPS_PASSWORD</code> (usuario y contraseña del portal) y <code>APP_ACCESS_KEY</code> (una clave larga inventada). Después, Redeploy. Las credenciales nunca llegan al navegador ni al código.
             </Callout>
           </CardBody>
         </Card>

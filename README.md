@@ -51,11 +51,24 @@ La aplicación se exporta como web estática a la carpeta `dist/` (`next.config.
 
 Las URL de las fichas son `/suministro/?cups=ES…`.
 
-## Conector SIPS
+## Buscador SIPS en vivo
 
-Pendiente. El flujo de acceso y exportación del portal no es público. El borrador de la ruta de servidor está en `docs/sips-connector-route.ts.txt`; las credenciales irían en variables de entorno de un servicio de servidor, nunca en el navegador.
+La página **Buscador SIPS** consulta el portal EAS Renovae a través de la función de servidor `api/sips.ts` (Vercel Functions, región París).
 
-Mientras tanto, exporta el Excel desde el portal e impórtalo: es el mismo formato.
+**Cómo funciona:**
+- Inicia sesión con `POST /Account/Login`, enviando el token CSRF.
+- Consulta `POST /Services/Core/PuntoSuministro/List`.
+- Devuelve las 97 columnas del Excel, que pasan por el mismo importador.
+
+**Qué se puede buscar:** el portal solo responde a búsquedas acotadas.
+- Por CUPS completo.
+- Por código postal, opcionalmente con dirección, tarifa y consumo mínimo.
+
+**Variables de entorno en Vercel:**
+- `SIPS_USER` y `SIPS_PASSWORD`: credenciales del portal.
+- `APP_ACCESS_KEY`: clave que el navegador envía en la cabecera `x-app-key`; se introduce en *Ajustes*.
+
+El navegador nunca recibe las credenciales.
 
 ## Persistencia y CRM
 
