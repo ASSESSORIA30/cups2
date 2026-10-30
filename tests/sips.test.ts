@@ -34,7 +34,7 @@ describe("Buscador SIPS · mapeo", () => {
       ]);
     }
     // Un CUPS de 22 caracteres sigue buscando por coincidencia exacta.
-    expect(c.ok && c.request.Criteria).toEqual([["TipoEnergia"], "=", 1], "and", caseVariants("CUPS", "ES0021000000000001RK0F"));
+    expect(c.ok && c.request.Criteria).toEqual([[["TipoEnergia"], "=", 1], "and", caseVariants("CUPS", "ES0021000000000001RK0F")]);
   });
   it("las filas devueltas pasan por el importador", () => {
     const rows = entitiesToRows([
