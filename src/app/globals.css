@@ -1,0 +1,119 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --bg: #f6f7f9;
+  --bg-elev: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #f1f3f6;
+  --border: #e3e6eb;
+  --border-strong: #cfd4dc;
+  --fg: #0b0d12;
+  --fg-2: #4a505c;
+  --fg-3: #7a8191;
+  --accent: #0e7c86;
+  --accent-2: #2a78d6;
+  --accent-fg: #ffffff;
+  --glow: rgba(14, 124, 134, 0.12);
+  /* paleta de series validada (orden fijo) */
+  --s1: #2a78d6;
+  --s2: #eb6834;
+  --s3: #1baf7a;
+  --s4: #eda100;
+  --s5: #e87ba4;
+  --s7: #6250d6;
+  /* estado (reservados) */
+  --good: #0ca30c;
+  --warning: #fab219;
+  --serious: #ec835a;
+  --critical: #d03b3b;
+  --chart-surface: #fcfcfb;
+}
+
+.dark {
+  --bg: #07090d;
+  --bg-elev: #0c0f15;
+  --surface: #10141b;
+  --surface-2: #161b24;
+  --border: #1f2632;
+  --border-strong: #2c3544;
+  --fg: #f0efec;
+  --fg-2: #c3c2b7;
+  --fg-3: #8a8f99;
+  --accent: #2dd4bf;
+  --accent-2: #3987e5;
+  --accent-fg: #04201d;
+  --glow: rgba(45, 212, 191, 0.14);
+  --s1: #3987e5;
+  --s2: #d95926;
+  --s3: #199e70;
+  --s4: #c98500;
+  --s5: #d55181;
+  --s7: #9085e9;
+  --chart-surface: #1a1a19;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-elev: var(--bg-elev);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-fg: var(--fg);
+  --color-fg-2: var(--fg-2);
+  --color-fg-3: var(--fg-3);
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
+  --color-accent-fg: var(--accent-fg);
+  --color-good: var(--good);
+  --color-warning: var(--warning);
+  --color-serious: var(--serious);
+  --color-critical: var(--critical);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--fg);
+}
+body {
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+.num {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}
+.hero-grad {
+  background: radial-gradient(1200px 400px at 10% -10%, var(--glow), transparent 60%),
+    radial-gradient(800px 300px at 90% 0%, color-mix(in srgb, var(--accent-2) 12%, transparent), transparent 60%);
+}
+.text-grad {
+  background: linear-gradient(120deg, var(--fg) 0%, var(--accent) 60%, var(--accent-2) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.grid-bg {
+  background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: radial-gradient(ellipse at top, black 20%, transparent 70%);
+}
+::selection {
+  background: color-mix(in srgb, var(--accent) 30%, transparent);
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+@media print {
+  aside,
+  header,
+  .no-print {
+    display: none !important;
+  }
+}
