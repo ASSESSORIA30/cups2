@@ -160,7 +160,7 @@ function SeasonChart({ s, t, pc, n }: { s: Supply; t: TariffCode; pc: number[]; 
   const option = useMemo<EChartsOption>(() => {
     const labels = MONTHS_SHORT.map((m, i) => {
       const ps = periodsInMonth(t, i, pen);
-      return `${m}\n${ps ? ps.map((p) => `P${p}`).join("·") : "P1–P" + n}`;
+      return `${m} · ${ps ? ps.map((p) => `P${p}`).join(" ") : "P1–P" + n}`;
     });
     const minPc = MONTHS_SHORT.map((_, i) => {
       const ps = periodsInMonth(t, i, pen) ?? Array.from({ length: n }, (_, k) => k + 1);
@@ -171,11 +171,11 @@ function SeasonChart({ s, t, pc, n }: { s: Supply; t: TariffCode; pc: number[]; 
       grid: { left: 8, right: 12, top: 36, bottom: 8, containLabel: true },
       legend: { top: 0, right: 0, textStyle: { color: tk.fg2, fontSize: 11 }, itemWidth: 10, itemHeight: 10 },
       tooltip: { trigger: "axis", backgroundColor: tk.surface, borderColor: tk.border, textStyle: { color: tk.fg, fontSize: 12 }, valueFormatter: (v: unknown) => (v == null || v === "-" ? "Sin dato" : `${fmt.n(Number(v), 1)} kW`) },
-      xAxis: { type: "category", data: labels, axisLabel: { color: tk.fg3, fontSize: 10, lineHeight: 14, interval: 0 }, axisLine: { lineStyle: { color: tk.border } }, axisTick: { show: false } },
+      xAxis: { type: "category", data: labels, axisLabel: { color: tk.fg3, fontSize: 10, interval: 0, formatter: (v: string) => v.split(" · ")[0] }, axisLine: { lineStyle: { color: tk.border } }, axisTick: { show: false } },
       yAxis: { type: "value", splitLine: { lineStyle: { color: tk.border, type: [3, 4] } }, axisLabel: { color: tk.fg3, fontSize: 11 } },
       series: [
         { name: "Máxima registrada del mes (sin periodo)", type: "bar", data: s.potMensual.map((v) => v ?? "-"), barMaxWidth: 24, itemStyle: { color: tk.s1, borderRadius: [4, 4, 0, 0] } },
-        { name: "Menor potencia contratada entre los periodos del mes", type: "line", step: "middle", data: minPc, symbol: "none", lineStyle: { color: tk.s4, width: 2 } },
+        { name: "Menor potencia contratada entre los periodos del mes", type: "line", step: "middle", data: minPc, symbol: "none", lineStyle: { color: tk.s4, width: 2 }, itemStyle: { color: tk.s4 } },
       ],
     };
   }, [tk, s, t, pc, n, pen]);

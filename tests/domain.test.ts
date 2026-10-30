@@ -267,3 +267,12 @@ describe("PDF", () => {
     expect(pdfSafe("cos φ ≥ 0,95 · 12 € · P1 ≤ P2")).toBe("cos phi >= 0,95 · 12 € · P1 <= P2");
   });
 });
+
+describe("Configuración de build", () => {
+  it("mantiene el procesado de Tailwind y la exportación a dist/", () => {
+    const cfg = fs.readFileSync("next.config.ts", "utf8");
+    expect(cfg).toContain("@tailwindcss/turbopack");
+    expect(cfg).toContain('distDir: "dist"');
+    expect(JSON.parse(fs.readFileSync("vercel.json", "utf8")).outputDirectory).toBe("dist");
+  });
+});
