@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { FIELD_HEADERS, POST, GET, buildListRequest, entitiesToRows, __resetSession } from "../api/sips";
+import { FIELD_HEADERS, handlePost, GET, buildListRequest, entitiesToRows, __resetSession } from "../api/sips";
 import { COLUMNS } from "@/lib/columns";
 import { parseRows } from "@/lib/parse";
 
@@ -75,13 +75,13 @@ describe("Buscador SIPS · sesión y seguridad (portal simulado)", () => {
   });
 
   it("rechaza sin clave y no expone credenciales en GET", async () => {
-    expect((await POST(req({ cp: "08201" }, "mala"), fake)).status).toBe(401);
+    expect((await handlePost(req({ cp: "08201" }, "mala"), fake)).status).toBe(401);
     const g = await GET().json();
     expect(JSON.stringify(g)).not.toContain("secreto");
     expect(g.configured).toBe(true);
   });
   it("login con CSRF + cookies y consulta", async () => {
-    const r = await POST(req({ cups: "ES0021000000000001RK0F" }), fake);
+    const r = await handlePost(req({ cups: "ES0021000000000001RK0F" }), fake);
     expect(r.status).toBe(200);
     const j = await r.json();
     expect(j.total).toBe(1);
@@ -91,19 +91,19 @@ describe("Buscador SIPS · sesión y seguridad (portal simulado)", () => {
     expect(h["X-CSRF-TOKEN"]).toBe("tok123");
     expect(h.Cookie).toContain(".AspNetAuth=AUTH");
     // segunda consulta reutiliza la sesión
-    await POST(req({ cp: "08201" }), fake);
+    await handlePost(req({ cp: "08201" }), fake);
     expect(calls.filter((c) => c.url.endsWith("/Account/Login")).length).toBe(1);
   });
   it("si la sesión caduca, vuelve a iniciar sesión", async () => {
-    await POST(req({ cp: "08201" }), fake);
+    await handlePost(req({ cp: "08201" }), fake);
     listStatus = 302;
-    const r = await POST(req({ cp: "08201" }), fake);
+    const r = await handlePost(req({ cp: "08201" }), fake);
     expect(r.status).toBe(200);
     expect(calls.filter((c) => c.url.endsWith("/Account/Login")).length).toBe(2);
   });
   it("credenciales incorrectas → error claro", async () => {
     process.env.SIPS_PASSWORD = "otra";
-    const r = await POST(req({ cp: "08201" }), fake);
+    const r = await handlePost(req({ cp: "08201" }), fake);
     expect(r.status).toBe(502);
     expect((await r.json()).error).toMatch(/rechazado/);
   });
