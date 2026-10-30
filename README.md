@@ -37,22 +37,25 @@ Todos los precios se pueden editar en **Ajustes** cuando se publique una nueva r
 npm install
 npm run dev          # http://localhost:3000
 npx vitest run       # 18 pruebas (importación real, normativa, optimizador vs fuerza bruta, reactiva, comparador, alertas, PDF)
-npm run build
+npm run build        # genera dist/
 ```
 
 `tests/fixtures/make_fixture.py` genera el Excel de pruebas a partir de las cabeceras reales.
 
 ## Despliegue en Vercel
 
-1. Sube el repositorio a GitHub e impórtalo en Vercel (framework detectado: Next.js).
-2. No hace falta configurar nada más: Vercel ejecuta `npm install` y `next build` (Node ≥ 20.9).
-3. Opcional: define `SIPS_USER` y `SIPS_PASSWORD` en *Environment Variables* (consulta `.env.example`).
+La aplicación se exporta como web estática a la carpeta `dist/` (`next.config.ts` → `output: "export"`), y `vercel.json` le indica a Vercel que la publique desde ahí. Funciona sin cambiar nada en el panel de Vercel.
+
+1. Sube **el contenido** de este proyecto a la raíz del repositorio. `package.json` y `vercel.json` deben quedar en la raíz.
+2. Vercel ejecuta `npm install` y `npm run build`, y publica `dist/`.
+
+Las URL de las fichas son `/suministro/?cups=ES…`.
 
 ## Conector SIPS
 
-`/api/sips` lee las credenciales solo de las variables de entorno del servidor. La descarga automática está **pendiente**: el flujo de login y exportación del portal no es público y no se pudo acceder a él desde el entorno de desarrollo.
+Pendiente. El flujo de acceso y exportación del portal no es público. El borrador de la ruta de servidor está en `docs/sips-connector-route.ts.txt`; las credenciales irían en variables de entorno de un servicio de servidor, nunca en el navegador.
 
-Mientras tanto, exporta el Excel desde el portal e impórtalo; es el mismo formato. Para implementarla, completa la función `POST` devolviendo filas con las 97 cabeceras, y el importador las procesará igual.
+Mientras tanto, exporta el Excel desde el portal e impórtalo: es el mismo formato.
 
 ## Persistencia y CRM
 

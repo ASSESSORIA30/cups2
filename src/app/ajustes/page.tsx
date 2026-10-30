@@ -1,5 +1,4 @@
 "use client";
-import { useEffect, useState } from "react";
 import { Image as ImageIcon, KeyRound, RotateCcw, Scale, Settings, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { DEFAULT_SETTINGS, useStore } from "@/lib/store";
@@ -15,13 +14,6 @@ export default function SettingsPage() {
   const setSettings = useStore((s) => s.setSettings);
   const clear = useStore((s) => s.clearSupplies);
   const reg = settings.regulated;
-  const [sips, setSips] = useState<{ configured: boolean; message: string } | null>(null);
-  useEffect(() => {
-    fetch("/api/sips")
-      .then((r) => r.json())
-      .then(setSips)
-      .catch(() => setSips({ configured: false, message: "No disponible" }));
-  }, []);
 
   const setPeaje = (t: (typeof TARIFFS)[number], i: number, v: number | null, key: "peajePot" | "cargoPot" | "excess45") =>
     setSettings((s) => ({ ...s, regulated: { ...s.regulated, [key]: { ...s.regulated[key], [t]: s.regulated[key][t].map((x, j) => (j === i ? (v ?? 0) : x)) } } }));
@@ -190,11 +182,11 @@ export default function SettingsPage() {
           </CardBody>
         </Card>
         <Card>
-          <CardHeader icon={<KeyRound />} title="Conector portal SIPS" subtitle="eas.renovaenergy.es" right={<Badge tone={sips?.configured ? "good" : "warning"}>{sips?.configured ? "Credenciales configuradas" : "Sin configurar"}</Badge>} />
+          <CardHeader icon={<KeyRound />} title="Conector portal SIPS" subtitle="eas.renovaenergy.es" right={<Badge tone="warning">Pendiente</Badge>} />
           <CardBody className="space-y-3 text-sm text-fg-2">
-            <p>{sips?.message ?? "Comprobando…"}</p>
+            <p>La descarga automática desde el portal está pendiente de documentar su acceso. Exporta el Excel desde el portal SIPS e impórtalo aquí: es exactamente el mismo formato.</p>
             <Callout tone="info">
-              Las credenciales se configuran solo en el servidor como variables de entorno (<code>SIPS_USER</code>, <code>SIPS_PASSWORD</code>) y nunca se envían al navegador. Mientras tanto, exporta el Excel desde el portal e impórtalo aquí: es exactamente el mismo formato.
+              Cuando se implemente, las credenciales irán en variables de entorno de un servicio de servidor (<code>SIPS_USER</code>, <code>SIPS_PASSWORD</code>), nunca en el navegador ni en el código.
             </Callout>
           </CardBody>
         </Card>

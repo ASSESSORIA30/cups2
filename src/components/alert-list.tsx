@@ -67,7 +67,7 @@ export function AlertList({ alerts, showCups, initialSeverities }: { alerts: Ale
                 </div>
               </div>
               {showCups && (
-                <Link href={`/suministro/${encodeURIComponent(a.cups)}`} className="num text-[11px] text-accent hover:underline">
+                <Link href={`/suministro/?cups=${encodeURIComponent(a.cups)}`} className="num text-[11px] text-accent hover:underline">
                   {a.cups}
                 </Link>
               )}

@@ -119,7 +119,7 @@ function Dashboard() {
           />
           <CardBody className="space-y-1.5">
             {top.map((r) => (
-              <Link key={r.s.cups} href={`/suministro/${encodeURIComponent(r.s.cups)}`} className="grid grid-cols-[44px_1fr_auto] items-center gap-3 rounded-xl px-3 py-2.5 transition hover:bg-surface-2">
+              <Link key={r.s.cups} href={`/suministro/?cups=${encodeURIComponent(r.s.cups)}`} className="grid grid-cols-[44px_1fr_auto] items-center gap-3 rounded-xl px-3 py-2.5 transition hover:bg-surface-2">
                 <div className="num grid size-10 place-items-center rounded-lg bg-accent/10 text-sm font-semibold text-accent">{r.score}</div>
                 <div className="min-w-0">
                   <div className="truncate text-sm font-medium">{r.s.direccion ?? r.s.cups}</div>
@@ -156,7 +156,7 @@ function Dashboard() {
           <CardBody className="space-y-2">
             {alerts.length ? (
               alerts.map((a) => (
-                <Link key={a.id} href={`/suministro/${encodeURIComponent(a.cups)}`} className="flex items-start gap-3 rounded-lg border border-border p-3 hover:border-border-strong">
+                <Link key={a.id} href={`/suministro/?cups=${encodeURIComponent(a.cups)}`} className="flex items-start gap-3 rounded-lg border border-border p-3 hover:border-border-strong">
                   <SeverityBadge s={a.severity} />
                   <div className="min-w-0">
                     <div className="text-sm">{a.title}</div>

@@ -91,7 +91,7 @@ function GlobalSearch() {
                     value={`${s.cups} ${s.direccion ?? ""} ${s.localidad ?? ""} ${s.provincia ?? ""} ${s.comercializadora ?? ""} ${s.cp ?? ""}`}
                     onSelect={() => {
                       setOpen(false);
-                      router.push(`/suministro/${encodeURIComponent(s.cups)}`);
+                      router.push(`/suministro/?cups=${encodeURIComponent(s.cups)}`);
                     }}
                     className="flex cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm data-[selected=true]:bg-surface-2"
                   >

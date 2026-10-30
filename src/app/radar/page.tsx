@@ -220,7 +220,7 @@ export default function RadarPage() {
                       </div>
                     </td>
                     <td className="max-w-[280px] px-3 py-2.5">
-                      <Link href={`/suministro/${encodeURIComponent(r.s.cups)}`} className="block truncate font-medium hover:text-accent">
+                      <Link href={`/suministro/?cups=${encodeURIComponent(r.s.cups)}`} className="block truncate font-medium hover:text-accent">
                         {r.s.direccion ?? "—"}
                       </Link>
                       <div className="num truncate text-[11px] text-fg-3">
