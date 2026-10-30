@@ -86,10 +86,10 @@ function SipsSearch() {
     if (mode === "cups") {
       const v = validateCups(cups);
       if (!v.valid) {
-        setError(`CUPS: ${v.reason}. Introduce el CUPS completo (20 o 22 caracteres).`);
+        setError(`CUPS: ${v.reason}. Introduce los 20 caracteres base o el CUPS de 22 caracteres.`);
         return;
       }
-      run({ cups, take: 1 });
+      run({ cups, take: 20 });
     } else run({ cp, direccion: dir, tarifa: tarifa || undefined, minKWh, skip: 0, take: PER });
   }
 
@@ -137,7 +137,7 @@ function SipsSearch() {
         </div>
         <form onSubmit={submit} className="relative grid items-end gap-3 sm:grid-cols-2 lg:grid-cols-6">
           {mode === "cups" ? (
-            <Field label="CUPS completo" className="sm:col-span-2 lg:col-span-5">
+            <Field label="CUPS eléctrico (con o sin sufijo)" className="sm:col-span-2 lg:col-span-5">
               <Input value={cups} onChange={(e) => setCups(e.target.value)} placeholder="ES0031…" className="num h-11 text-base" autoFocus />
             </Field>
           ) : (
@@ -165,7 +165,7 @@ function SipsSearch() {
             {busy ? <Loader2 className="animate-spin" /> : <Search />} Buscar
           </Button>
         </form>
-        <p className="relative mt-3 text-[11px] text-fg-3">El portal solo admite CUPS completos o búsquedas acotadas por código postal (32 millones de suministros). Resultados ordenados por consumo anual.</p>
+        <p className="relative mt-3 text-[11px] text-fg-3">Para suministros eléctricos puedes buscar con los 20 caracteres base (sin 0F ni otro sufijo) o con los 22 completos. También puedes buscar por código postal. Resultados ordenados por consumo anual.</p>
       </Card>
 
       {error && <Callout tone="critical">{error}</Callout>}
@@ -262,7 +262,7 @@ function SipsSearch() {
       {!res && !busy && (
         <div className="grid gap-3 md:grid-cols-3">
           {[
-            ["1", "Busca", "Por CUPS completo o por código postal, dirección, tarifa y consumo mínimo."],
+            ["1", "Busca", "Por CUPS eléctrico con o sin sufijo, o por código postal, dirección, tarifa y consumo mínimo."],
             ["2", "Selecciona", "Añade a la cartera los suministros que te interesen."],
             ["3", "Analiza", "Radiografía, Power Optimizer, reactiva y ofertas con los datos oficiales del SIPS."],
           ].map(([n, t, d]) => (

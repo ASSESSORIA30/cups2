@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { FIELD_HEADERS, handlePost, GET, buildListRequest, entitiesToRows, __resetSession } from "../api/sips";
+import { FIELD_HEADERS, handlePost, GET, buildListRequest, entitiesToRows, caseVariants, __resetSession } from "../api/sips";
 import { COLUMNS } from "@/lib/columns";
 import { parseRows } from "@/lib/parse";
 
@@ -18,11 +18,23 @@ describe("Buscador SIPS · mapeo", () => {
       expect(r.request.Take).toBe(100);
       expect(r.request.EqualityFilter).toEqual({ CodigoPostal: "08201" });
       expect(JSON.stringify(r.request.Criteria)).toBe(
-        JSON.stringify([[[[["TipoEnergia"], "=", 1], "and", [["Direccion"], "like", "%Migdia 5%"]], "and", [["IdTarifaNombreTarifa"], "=", "3.0TD"]], "and", [["EActivaAnual"], ">=", 100000]]),
+        JSON.stringify([[[[["TipoEnergia"], "=", 1], "and", caseVariants("Direccion", "Migdia 5", "%", "%")], "and", [["IdTarifaNombreTarifa"], "=", "3.0TD"]], "and", [["EActivaAnual"], ">=", 100000]]),
       );
     }
     const c = buildListRequest({ cups: "es 0021 0000 0000 0001 rk 0f" });
-    expect(c.ok && c.request.EqualityFilter).toEqual({ CUPS: "ES0021000000000001RK0F" });
+    expect(c.ok && c.request.EqualityFilter).toEqual({});
+    // CUPS eléctrico de 20 caracteres: encuentra el mismo CUPS con cualquier
+    // extensión de dos caracteres (por ejemplo 0F).
+    const short = buildListRequest({ cups: "es 0021 0000 0000 0001 rk" });
+    expect(short.ok).toBe(true);
+    if (short.ok) {
+      expect(short.request.EqualityFilter).toEqual({});
+      expect(short.request.Criteria).toEqual([
+        [["TipoEnergia"], "=", 1], "and", caseVariants("CUPS", "ES0021000000000001RK", "", "%")
+      ]);
+    }
+    // Un CUPS de 22 caracteres sigue buscando por coincidencia exacta.
+    expect(c.ok && c.request.Criteria).toEqual([["TipoEnergia"], "=", 1], "and", caseVariants("CUPS", "ES0021000000000001RK0F"));
   });
   it("las filas devueltas pasan por el importador", () => {
     const rows = entitiesToRows([

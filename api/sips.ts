@@ -99,6 +99,16 @@ export interface SearchInput {
 
 const TARIFAS = ["2.0TD", "3.0TD", "6.1TD", "6.2TD", "6.3TD", "6.4TD"];
 
+/** Variant-based matching for portals with a case-sensitive database collation.
+ * Covers uppercase, lowercase and common title-case data without relying on
+ * SQL functions that older Serenity installations might reject. */
+export function caseVariants(field: string, value: string, prefix = "", suffix = ""): unknown {
+  const title = value.toLocaleLowerCase("es-ES").replace(/(^|[\s/.,-])([^\s/.,-])/g, (_, sep: string, c: string) => sep + c.toLocaleUpperCase("es-ES"));
+  const candidates = [...new Set([value, value.toLocaleUpperCase("es-ES"), value.toLocaleLowerCase("es-ES"), title])];
+  const clauses = candidates.map((v) => [[field], "like", `${prefix}${v}${suffix}`]);
+  return clauses.slice(1).reduce<unknown>((acc, c) => [acc, "or", c], clauses[0]);
+}
+
 /** Valida la consulta y construye la petición Serenity. Exige CUPS completo o código postal. */
 export function buildListRequest(q: SearchInput): { ok: true; request: Record<string, unknown> } | { ok: false; error: string } {
   const cups = String(q.cups ?? "").toUpperCase().replace(/[\s\-.]/g, "");
@@ -110,12 +120,15 @@ export function buildListRequest(q: SearchInput): { ok: true; request: Record<st
   const eq: Record<string, string> = {};
   if (cups) {
     if (!/^ES\d{16}[A-Z]{2}([0-9A-Z]{2})?$/.test(cups)) return { ok: false, error: "CUPS incompleto o con formato no válido (ES + 16 dígitos + 2 letras)." };
-    eq.CUPS = cups;
+    // Los CUPS eléctricos del CRM suelen omitir los dos caracteres opcionales
+    // de frontera (por ejemplo, 0F). Para 20 caracteres, buscar por prefijo
+    // tanto suministros con sufijo como sin él; con 22, coincidencia exacta.
+    extra.push(caseVariants("CUPS", cups, "", cups.length === 20 ? "%" : ""));
   } else {
     if (!/^\d{5}$/.test(cp)) return { ok: false, error: "Indica un CUPS completo o un código postal de 5 dígitos (sin código postal la búsqueda en 32 millones de suministros no responde)." };
     eq.CodigoPostal = cp;
     const dir = String(q.direccion ?? "").trim().replace(/[%_\[\]]/g, " ").replace(/\s+/g, " ").trim();
-    if (dir) extra.push([["Direccion"], "like", `%${dir}%`]);
+    if (dir) extra.push(caseVariants("Direccion", dir, "%", "%"));
     if (q.tarifa) {
       if (!TARIFAS.includes(q.tarifa)) return { ok: false, error: "Tarifa no válida." };
       extra.push([["IdTarifaNombreTarifa"], "=", q.tarifa]);
